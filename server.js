@@ -25,7 +25,7 @@ const IMAGE_BASE_URL = process.env.R2_IMAGE_BASE_URL;
 const IMAGE_DIR = process.env.R2_IMAGE_DIR;
 const IMAGE_COMPRESSION_QUALITY = parseInt(process.env.IMAGE_COMPRESSION_QUALITY, 10);
 
-const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 async function checkAndCreateThumbnail(key) {
   const thumbnailKey = `${IMAGE_DIR}/preview/${path.basename(key)}`;
