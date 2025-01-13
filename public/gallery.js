@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const SCROLL_THRESHOLD = 100; // Scroll threshold to start hiding the header
     let currentImageRequest = null; // Variable to hold the current image request
     let currentExifRequest = null; // Variable to hold the current EXIF request
+    let currentImageIndex = 0; // Variable to hold the current image index
 
     // Fetch configuration from server
     fetch('/config')
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.src = imageUrl.thumbnail;
                 img.alt = `Photo ${index + 1}`;
                 img.classList.add('loaded'); // Assume images are loaded after initial load
-                img.onclick = () => openModal(imageUrl.original);
+                img.onclick = () => openModal(index);
                 columnElements[index % columns].appendChild(img);
             });
         }
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
                 img.onclick = function () {
-                    openModal(imageUrls[i].original);
+                    openModal(i);
                 };
                 img.onerror = () => {
                     console.error(`Error loading image: ${imageUrls[i].thumbnail}`);
@@ -173,7 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const exifInfo = document.getElementById('exif-info');
         const span = document.getElementsByClassName('close')[0];
 
-        function openModal(src) {
+        function openModal(index) {
+            currentImageIndex = index;
+            const src = imageUrls[index].original;
+
             // Cancel any ongoing image or EXIF requests
             if (currentImageRequest) {
                 currentImageRequest.abort();
@@ -198,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (!exifController.signal.aborted) {
                         exifInfo.innerHTML = `
-                            <p>光圈: ${data.FNumber ? `f/${data.FNumber}` : 'N/A'}  ·  快门: ${data.ExposureTime ? `${data.ExposureTime}s` : 'N/A'}  ·  ISO: ${data.ISO ? data.ISO : 'N/A'}</p>
+                            <p>作者: ${data.Make ? data.Make : 'N/A'}  ·  光圈: ${data.FNumber ? `f/${data.FNumber}` : 'N/A'}  ·  快门: ${data.ExposureTime ? `${data.ExposureTime}s` : 'N/A'}  ·  ISO: ${data.ISO ? data.ISO : 'N/A'}</p>
                         `;
                     }
                 })
@@ -250,6 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeModal();
+            } else if (event.key === 'ArrowLeft') {
+                if (currentImageIndex > 0) {
+                    openModal(currentImageIndex - 1);
+                }
+            } else if (event.key === 'ArrowRight') {
+                if (currentImageIndex < imageUrls.length - 1) {
+                    openModal(currentImageIndex + 1);
+                }
             }
         });
 

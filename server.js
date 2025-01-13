@@ -82,6 +82,7 @@ async function getExifData(key) {
   const parser = exifParser.create(imageBuffer);
   const exifData = parser.parse().tags;
   return {
+    Make: exifData.Make,
     FNumber: exifData.FNumber,
     ExposureTime: exifData.ExposureTime,
     ISO: exifData.ISO,
